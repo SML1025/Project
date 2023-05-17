@@ -1,0 +1,553 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.softsociety.exam.dao.SuksoDAO">
+
+	<!-- 숙소 정보 저장 -->
+	<insert id="insertsukso" parameterType="sukso">
+	<selectKey resultType="int" keyProperty="suk_num" order="BEFORE">
+		select PP_sukso_seq.nextval from dual
+	</selectKey>
+		insert into PP_sukso (
+		suk_num
+		, suk_name
+		, mem_id
+		, suk_address
+		, suk_location
+		, suk_nearby
+	    , suk_price1
+	   
+		<if test="suk_files_orz !=null and suk_files_saved !=null">
+			,suk_files_orz
+			,suk_files_saved
+		</if>
+		)
+		values (
+		 #{suk_num}
+		, #{suk_name}
+		, #{mem_id}
+		, #{suk_address}
+		, #{suk_location}
+		, #{suk_nearby}
+		, #{suk_price1}
+	    
+		<if test="suk_files_orz !=null and suk_files_saved !=null">
+			,#{suk_files_orz}
+			,#{suk_files_saved}
+		</if>
+		)
+	</insert>
+	
+	<insert id="insertspec" parameterType="sukso_spec">
+	
+		insert into PP_suk_spec(
+		  suk_num
+		, suk_bed
+		, suk_restroom
+		, suk_parking 
+		, suk_kitchin
+		, suk_bbq
+	    , suk_maxmember
+	    , suk_cctv
+	    , suk_pet
+	    , suk_floor
+	    , suk_elev
+	    , suk_wifi
+	    , suk_laundary
+	    , suk_notice 
+		)
+		values (
+		  #{suk_num}
+		, #{suk_bed}
+		, #{suk_restroom}
+		, #{suk_parking}
+		, #{suk_kitchin}
+		, #{suk_bbq}
+		, #{suk_maxmember}
+	    , #{suk_cctv}
+	    , #{suk_pet}
+	    , #{suk_floor}
+	    , #{suk_elev}
+	    , #{suk_wifi}
+	    , #{suk_laundary}
+	    , #{suk_notice}
+		)
+	</insert>
+
+
+<!-- 여기 진행중 -->
+
+<select id="selectByTags" parameterType="map" resultType="Sukso">
+	SELECT
+		*
+	FROM
+		PP_Sukso
+  <trim prefix="WHERE">
+    <if test="tags != null">
+		suk_num IN (
+					SELECT
+						suk_num
+					FROM
+						intag JOIN tags ON intag.id = tags.id
+					WHERE
+						name = #{tags}
+				    )
+    </if>
+    <if test="suk_location != null and suk_location != ''">
+	AND suk_location = #{suk_location}
+    </if>
+    <if test="suk_nearby != null and suk_nearby != ''">
+	AND suk_nearby = #{suk_nearby}
+    </if>
+  </trim>
+</select>
+
+<select id="selectSukso" parameterType="int" resultType="sukso">
+	SELECT
+		*
+	FROM
+		PP_Sukso
+	WHERE
+		suk_num = #{suk_num}
+</select>
+
+<select id="searchCount" resultType="int" parameterType="Map">
+SELECT
+	count(*)
+FROM
+	PP_Sukso
+WHERE
+	1 = 1
+    <if test="tags != null">
+      		suk_num IN (
+        	SELECT
+        		suk_num
+			FROM
+        		intag
+       		JOIN tags ON intag.id = tags.id
+        	WHERE 
+	        <foreach collection="tags" item ="tag" separator="and">
+		        name = #{tag}
+	        </foreach>
+      		)
+    	</if>
+	    <if test="suk_location != null and suk_location != ''">
+	      AND suk_location = #{suk_location}
+	    </if>
+	    <if test="suk_nearby != null and suk_nearby != ''">
+	      AND suk_nearby = #{suk_nearby}
+	    </if>
+</select>
+
+
+<select id="count" resultType="int" parameterType="Map">
+SELECT
+	count(*)
+FROM
+	PP_Sukso
+WHERE
+	1=1
+    <if test="suk_location != null and suk_location != ''">
+      AND suk_location = #{suk_location}
+    </if>
+    <if test="suk_nearby != null and suk_nearby != ''">
+      AND suk_nearby = #{suk_nearby}
+    </if>
+    <if test="tags != null and tags != ''">
+      AND suk_num IN (
+        SELECT
+        	suk_num
+        FROM
+        	intag
+        JOIN tags ON intag.id = tags.id
+        WHERE
+        	name = #{tags}
+      )
+    </if>
+</select>
+
+<select id="find" parameterType="String" resultType="member">
+SELECT
+	*
+FROM
+	PP_member
+WHERE
+	mem_id = #{mem_id}
+</select>
+
+<insert id="writeReview" parameterType="review">
+		insert into PP_review (
+		rev_num
+		, suk_num
+		, mem_id
+		, rev_star_clean
+		, rev_star_faci
+		, rev_star_access
+		, rev_star_service
+		, rev_star_avg
+		, rev_contents
+		<if test="rev_files_orz !=null and rev_files_saved !=null">
+			, rev_files_orz
+			, rev_files_saved
+		</if>
+		)
+		values (
+		PP_review_seq.NEXTVAL
+		, #{suk_num}
+		, #{mem_id}
+		, #{rev_star_clean}
+		, #{rev_star_faci}
+		, #{rev_star_access}
+		, #{rev_star_service}
+		, #{rev_star_avg}
+		, #{rev_contents}
+		<if test="rev_files_orz !=null and rev_files_saved !=null">
+			, #{rev_files_orz}
+			, #{rev_files_saved}
+		</if>
+		)
+	</insert>
+
+<select id="readReview" parameterType="int" resultType="review">
+		SELECT
+			*
+		FROM
+			PP_review
+		WHERE
+			suk_num = #{suk_num}
+		ORDER BY
+			rev_star_clean DESC
+	</select>
+	
+<select id="readRev" parameterType="int" resultType="review">
+		SELECT
+			*
+		FROM
+			PP_review
+		WHERE
+			rev_num = #{rev_num}
+</select>
+
+<select id="rev_count" parameterType="int" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			PP_review
+		WHERE
+			suk_num = #{suk_num}
+</select>
+
+<!-- 상명상 4/06 -->
+
+<select id="rescheck" parameterType="Object" resultType="reservation"> 
+	SELECT
+		*
+	FROM
+		PP_reservation
+	WHERE
+		suk_num = #{suk_num}
+	AND
+		mem_id = #{mem_id}
+	AND
+		res_state=3
+
+</select> 
+
+
+<!-- 모든 태그 셀렉트 -->
+<select id="selectAll" resultType="Tags">
+	SELECT
+		*
+	FROM
+		tags
+</select>
+
+<!-- 태그 하나하나 셀렉트 -->
+<select id="selectOne" resultType="Tags">
+	SELECT
+		*
+	FROM
+		tags
+	WHERE
+		name = #{name}
+</select>
+
+<insert id="insert" parameterType="Tags">
+	<selectKey resultType="int" keyProperty="id" order="BEFORE">
+		select tags_seq.nextval from dual
+	</selectKey>
+	INSERT INTO
+		tags 
+		values (
+		#{id}
+		, #{name}
+	)
+</insert>
+
+<!-- intag에 넣을 것 -->
+<!-- 
+	이 아래는 중복 삽입 불가능하게 해놓은 코드.
+	필요하면 삽입할 것.
+	WHERE NOT EXISTS (SELECT
+						name
+					  FROM
+					  	intag
+					  WHERE id = #{id}
+					  AND suk_num = #{suk_num})
+ -->
+<insert id="insert2" parameterType="Intag">
+	INSERT INTO
+		intag
+		(
+			id
+			, suk_num
+			, input_person
+		) 
+	SELECT
+		#{id}
+		, #{suk_num}
+		, 10
+	FROM
+		dual
+</insert>
+
+<insert id="insert3" parameterType="Intag">
+	INSERT INTO
+		intag
+		(
+			id
+			, suk_num
+			, input_person
+		) 
+	SELECT
+		#{id}
+		, #{suk_num}
+		, 20
+	FROM
+		dual
+</insert>
+
+<!-- 성호씨 4/06 -->
+<select id="selectSpec" parameterType="int" resultType="Sukso_spec">
+      select
+      *
+      from
+      PP_suk_spec
+      where suk_num=#{num}
+</select>
+
+<select id="selectMember" parameterType="String" resultType="Member">
+   select
+   		*
+   from
+   		PP_member 
+   where
+   		mem_id = #{mem_id}
+</select> 
+
+<select id="getIntagList" resultType="Intag">
+	SELECT
+		*
+	FROM
+		intag
+</select> 
+
+<select id="getTagsList" resultType="tags">
+   select
+   		*
+   from
+		tags
+</select>
+
+<!-- 
+<select id="getIntagListBySuk" parameterType="int" resultType="Intag">
+	SELECT
+		*
+	FROM
+		intag
+	WHERE
+		suk_id = #{suk_id}	
+</select>
+ -->
+
+<select id="getIntagListBySuk" parameterType="int" resultType="Tags">
+  SELECT DISTINCT tags.name
+  FROM intag
+  JOIN tags ON intag.id = tags.id
+  WHERE intag.suk_num = #{suk_num}
+</select>
+
+<select id="getTagsListByHost" parameterType="int" resultType="Tags">
+  SELECT tags.name
+  FROM intag
+  JOIN tags ON intag.id = tags.id
+  WHERE intag.suk_num = #{suk_num}
+  AND intag.input_person = 10
+</select>
+
+<select id="getTagsListByRev" parameterType="int" resultType="Tags">
+  SELECT
+  	tags.name
+  FROM
+  	intag
+  JOIN tags ON intag.id = tags.id
+  WHERE
+  	intag.suk_num = #{suk_num}
+  AND
+  	intag.input_person = 20
+</select>
+
+<select id="checkRes" parameterType="String" resultType="reservation">
+SELECT * FROM PP_RESERVATION
+WHERE mem_id=#{mem_id} and res_state!=3
+
+</select>
+
+<insert id="picture" parameterType="Suk_files">
+   INSERT INTO PP_SUK_FILES (
+         suk_files_num
+      <if test="suk_files_orz !=null and suk_files_saved !=null">
+         ,suk_files_orz
+         ,suk_files_saved
+      </if>
+        , suk_num   
+      )
+      VALUES (
+      PP_suk_files_seq.nextval
+       <if test="suk_files_orz !=null and suk_files_saved !=null">
+         ,#{suk_files_orz}
+         ,#{suk_files_saved}
+      </if>
+       ,#{suk_num}
+      )
+</insert>
+
+<select id="getpicture" parameterType="int" resultType="suk_files">
+
+SELECT * FROM PP_suk_files WHERE suk_num=#{num} 
+</select>
+<select id="getpic" parameterType="int" resultType="suk_files">
+SELECT * FROM PP_suk_files WHERE suk_files_num=#{num} 
+</select>
+
+<select id="star" parameterType="int" resultType="sum">
+SELECT
+  ROUND(SUM(rev_star_clean)/COUNT(*), 1) AS avg_clean,
+  ROUND(SUM(rev_star_access)/COUNT(*), 1) AS avg_access,
+  ROUND(SUM(rev_star_faci)/COUNT(*), 1) AS avg_faci,
+  ROUND(SUM(rev_star_service)/COUNT(*), 1) AS avg_service,
+  ROUND(SUM(rev_star_avg)/COUNT(*), 1) AS sum_avg,
+  COUNT(*) AS avg_count
+FROM pp_review where suk_num=#{num}
+</select>
+
+<select id="selectSuksoList" parameterType="map" resultType="SukNumCount">
+  select  suk_num, count(*) as count from intag where id in (
+        select id from tags
+        
+  		 <if test="tags != null and tags.size() > 0">
+	        where name in 
+	        <foreach collection="tags" item="tag" open="(" separator="," close=")">
+	          #{tag}
+	        </foreach>
+	    </if>
+        )
+        
+    group by suk_num
+</select>
+
+<select id="getSuksoBySukNUm" parameterType="int" resultType="Sukso">
+	select * from pp_sukso where suk_num = #{suk_num}
+</select>
+
+
+<!-- 	기존 코드
+<select id="selectSuksoList" parameterType="map" resultType="Sukso">
+  SELECT *
+  FROM PP_Sukso
+  <trim prefix="WHERE" prefixOverrides="AND |OR ">
+    <if test="suk_location != null and suk_location != ''">
+      AND suk_location = #{suk_location}
+    </if>
+    <if test="suk_nearby != null and suk_nearby != ''">
+      AND suk_nearby = #{suk_nearby}
+    </if>
+    <if test="tags != null and tags != ''">
+      AND suk_num IN (
+        SELECT suk_num
+        FROM intag
+        JOIN tags ON intag.id = tags.id
+        WHERE name=#{tags}
+      )
+    </if>
+  </trim>
+</select>
+ -->
+
+ <!-- 임시 -->
+ <!-- 
+<select id="selectSuksoList2" parameterType="map" resultType="Sukso">
+	SELECT
+		*
+	FROM
+		PP_Sukso
+  <trim prefix="WHERE" prefixOverrides="AND | OR ">
+    <if test="tags != null">
+      suk_num IN (
+		SELECT
+			suk_num
+		FROM
+			intag
+        JOIN tags ON intag.id = tags.id
+        WHERE
+       	<foreach collection="tags" item="tag" separator=" and ">
+       	tags.name = #{tag}
+       	</foreach>
+		)
+    </if>
+    <if test="suk_location != null and suk_location != ''">
+	AND
+		suk_location = #{suk_location}
+    </if>
+    <if test="suk_nearby != null and suk_nearby != ''">
+	AND
+		suk_nearby = #{suk_nearby}
+    </if>
+  </trim>
+</select>
+ -->
+ 
+ <!--
+
+<select id="selectSuksoList" parameterType="map" resultType="Sukso">
+	SELECT
+		*
+	FROM
+		PP_Sukso
+	<trim prefix="WHERE" prefixOverrides="AND | OR ">
+		<if test="tags != null">
+      		suk_num IN (
+        	SELECT
+        		suk_num
+			FROM
+        		intag
+       		JOIN tags ON intag.id = tags.id
+        	WHERE 
+	        <foreach collection="list" item = "tags" separator="and">
+		        name = #{tags}
+	        </foreach>
+      		)
+    	</if>
+	    <if test="suk_location != null and suk_location != ''">
+	      AND suk_location = #{suk_location}
+	    </if>
+	    <if test="suk_nearby != null and suk_nearby != ''">
+	      AND suk_nearby = #{suk_nearby}
+	    </if>
+	</trim>
+</select>
+
+-->
+
+</mapper>

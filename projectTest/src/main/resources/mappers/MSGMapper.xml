@@ -1,0 +1,33 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.softsociety.exam.dao.MSGDAO">
+
+<!-- 회원정보 저장 -->
+<insert id="sendMSG" parameterType="MSG">
+  insert into PP_message (
+        msg_num
+		,sender_mem_id
+		,receiver_mem_id
+		,msg_title
+		,msg_contents
+		,suk_num
+		
+	) 
+    values (
+        PP_message_seq.NEXTVAL
+		 , #{sender_mem_id}
+		 , #{receiver_mem_id}
+		, #{msg_title}
+		, #{msg_contents}
+		, #{suk_num}
+	)
+</insert>
+<select id="findMSG" parameterType="String" resultType="MSG">
+select * from pp_message where receiver_mem_id=#{receiver_mem_id}
+
+</select>
+
+ 
+</mapper>

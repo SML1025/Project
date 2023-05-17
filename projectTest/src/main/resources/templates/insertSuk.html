@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <meta name="author" content="">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> 숙소 입력 페이지 </title>
+
+  <!-- 태기파이 추가 -->
+  <script th:src="@{/js/jquery-3.6.0.js}"></script>
+
+  <!-- tagify 라이브러리 -->
+  <script th:src="@{/js/tagify/tagify.min.js}"></script>
+  <!-- 폴리필 (구버젼 브라우저 지원) -->
+  <script th:src="@{/js/tagify/tagify.polyfills.min.js}"></script>
+  <!-- tagify CSS -->
+  <link th:href="@{/js/tagify/tagify.css}" rel="stylesheet" type="text/css">
+<link href="
+https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css
+" rel="stylesheet">
+
+
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script th:src="@{/js/jquery-3.6.3.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <style>
+    .tagify{    
+      width: 100%;
+      max-width: 700px;
+    }
+     
+    .tags-look .tagify__dropdown__item{
+      display: inline-block;
+      border-radius: 3px;
+      padding: .3em .5em;
+      border: 1px solid #CCC;
+      background: #F3F3F3;
+      margin: .2em;
+      font-size: .85em;
+      color: black;
+      transition: 0s;
+    }
+     
+    .tags-look .tagify__dropdown__item--active{
+      color: black;
+    }
+     
+    .tags-look .tagify__dropdown__item:hover{
+      background: lightyellow;
+      border-color: gold;
+    }
+    </style>
+
+    <script>
+    let tagify = null;
+    
+    $(document).ready(function() {
+      let input = document.querySelector('input[name="tags"]');
+    
+      //init Tagify script on the above inputs
+      tagify = new Tagify(input, {
+        whitelist: [], // 화이트리스트 배열
+        maxTags: 5, // 최대 허용 태그 갯수
+      
+        dropdown: {
+          maxItems: 20,           // 드롭다운 메뉴에서 몇개 정도 항목을 보여줄지
+          classname: "tags-look", // 드롭다운 메뉴 엘리먼트 클래스 이름. 이걸로 css 선택자로 쓰면 된다.
+          enabled: 0,             // 단어 몇글자 입력했을떄 추천 드롭다운 메뉴가 나타날지
+          closeOnSelect: false    // 드롭다운 메뉴에서 태그 선택하면 자동으로 꺼지는지 안꺼지는지
+        }
+      });
+      
+      //태그 입력란에 키 입력 이벤트 처리
+      tagify.on('input', onInput);
+    
+      $('#bt').click(function() {
+        let inputTags = $('#tags').val();
+        alert(JSON.stringify(tagify.value));
+        console.log(inputTags);
+      });
+      
+      $('#bt2').click(function() {
+        $('#tags').val('벚꽃,한옥');
+      });
+    
+    });
+    
+    //태그 입력란에 입력되고 있을 때
+    function onInput(e){
+        console.log("onInput: ", e.detail);
+        
+        //입력되고 있는 문자열
+        let value = e.detail.value;
+        //제시 목록 초기화
+        tagify.whitelist = null;
+        tagify.loading(true).dropdown.hide()
+        
+        $.ajax({
+          url: 'getTagifyList',
+          method: 'get',
+          data: {value: value},
+          dataType: 'json',
+          success: function(list) {
+            //alert(list);
+            tagify.whitelist = list;
+            tagify.loading(false).dropdown.show(value);
+          },
+          error: function(e) {
+            alert(JSON.stringify(e));
+          }
+        });
+    }
+    
+    function formSubmit() {
+      let tagsObject = tagify.value;
+      console.log(tagsObject);
+      
+      let tagsString = '';
+      
+      $.each(tagsObject, function(i, ob) {
+        console.log(i, ob.value);
+        tagsString += ob.value + ',';
+      });
+      
+      $('#tags').val(tagsString);
+      return true;
+    }
+
+// onsubmit시 추가로 실행될 함수(막음)
+
+// function Insert_tag() {
+//   // AJAX 요청 보내기
+//   $.ajax({
+//     url: "/insert2",
+//     type: "POST",
+//     data: {param1: "value1", param2: "value2"},
+//     success: function(response) {
+//       // 요청이 성공하면 실행되는 함수
+//       console.log(response);
+//     },
+//     error: function(xhr, status, error) {
+//       // 요청이 실패하면 실행되는 함수
+//       console.error(xhr, status, error);
+//     }
+//   });
+  
+//   // 폼 제출 방지
+//   return false;
+// }
+
+    </script>
+
+
+
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="images/favicon.png">
+  <!-- Style CSS -->
+  <link rel="stylesheet" href="../css/stylesheet.css">
+  <link rel="stylesheet" href="../css/mmenu.css">
+  <link rel="stylesheet" href="../css/style.css" id="colors">
+  <!-- Google Font -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800&display=swap&subset=latin-ext,vietnamese"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700,800" rel="stylesheet"
+    type="text/css">
+<script>
+	 function validation() {
+		
+		//숙소 이름
+/* 		let suk_name = document.getElementById('suk_name');
+
+		if (suk_name.value == '') {
+			alert('숙소이름을 입력하세요.');
+			return false;
+		} */
+		
+		//숙소 주소
+		
+		let suk_address = $('#suk_address').val();
+
+		if (suk_address == null || suk_address == '') {
+			Swal.fire({
+			    icon: 'error',
+			    title: '주소를 입력하세요.',
+			    confirmButtonText: '확인'})
+			return false;
+		}
+		
+	
+		
+		//침대 개수
+ 		let suk_bed = document.getElementById('#suk_bed').val;
+ 		let suk_floor = document.getElementById('#suk_floor').val;
+ 		let suk_restroom = document.getElementById('#suk_restroom').val;
+ 		let suk_price1 = document.getElementById('#suk_price1').val;
+ 		let suk_maxmember = document.getElementById('#suk_maxmember').val;
+ 		suk_maxmember
+
+		if (suk_bed < 0) {
+			Swal.fire({
+			    icon: 'error',
+			    title: '침대 개수를 정확히 입력하세요.',
+			    confirmButtonText: '확인'})
+			return false;
+		} 
+		if (suk_floor < 0) {
+			Swal.fire({
+			    icon: 'error',
+			    title: '층수를 정확히 입력하세요.',
+			    confirmButtonText: '확인'})
+			return false;
+		} 
+		if (suk_restroom < 0) {
+			Swal.fire({
+			    icon: 'error',
+			    title: '화장실 수를 정확히 입력하세요.',
+			    confirmButtonText: '확인'})
+			return false;
+		} 
+		
+		if (suk_price1 < 0) {
+			Swal.fire({
+			    icon: 'error',
+			    title: '화장실 수를 정확히 입력하세요.',
+			    confirmButtonText: '확인'})
+			return false;
+		} 
+		if (suk_maxmember < 0) {
+			Swal.fire({
+			    icon: 'error',
+			    title: '인원 수를 정확히 입력하세요.',
+			    confirmButtonText: '확인'})
+			return false;
+		} 
+		
+		//태그
+			let tags = $('#tags').val();
+
+			if (tags == null || tags == '') {
+				alert("태그를 입력하세요.");
+				return false;
+			}
+			
+		return true;
+	} 
+</script>
+
+</head>
+
+<body>
+  <!-- Preloader Start -->
+  <div class="preloader">
+    <div class="utf-preloader">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  <!-- Wrapper -->
+  <div id="main_wrapper">
+    <header id="header_part">
+      <div id="header">
+        <div class="container">
+          <div class="utf_left_side">
+            <div id="logo">
+							<a th:href="@{/}">PickPick</a>
+						</div>
+          </div>
+          <div class="utf_right_side">
+            <div class="header_widget">
+              <div class="dashboard_header_button_item has-noti js-item-menu">
+   
+                <div class="dashboard_notifi_dropdown js-dropdown">
+             
+                  <div class="dashboard_notifi_item">
+                    <div class="bg-c1 red">
+                      <i class="fa fa-check"></i>
+                    </div>
+                 
+                  </div>
+         
+                </div>
+              </div>
+         
+
+            </div>
+          </div>
+          
+         
+
+      </div>
+    </header>
+    <div class="clearfix"></div>
+    <div id="titlebar" class="gradient">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <h2>숙소등록</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--
+
+    <form action="suk_tagify" method="post" onsubmit="return formSubmit();">
+      <p><input name="tags" id="tags" placeholder="검색될 때 사용될 숙소 태그를 입력하세요!"></p>
+      <p><input type="submit" value="폼 서브밋"></p>
+    </form>
+
+    -->
+
+<!-- 그 다음엔  -->
+    <form method="post" class="register" th:action="@{/sukso/join}"
+          enctype="multipart/form-data" onsubmit="return validation();" 여기>
+    <div class="container margin-bottom-75" style="width: 1000px;">
+      <div class="row">
+        <div class="col-lg-12">
+          <div id="utf_add_listing_part">
+            <div class="add_utf_listing_section margin-top-45">
+            
+            
+            
+              <div class="utf_add_listing_part_headline_part">
+                <h3><i class="sl sl-icon-tag"></i>숙소등록</h3>
+              </div>
+              
+              <div class="row with-forms">
+                <div class="col-md-6">
+                  <h5>숙소 이름</h5>
+                  <input type="text" name="suk_name" id="suk_name" value="" required>
+                </div>
+              </div>
+              
+            <div class="row with-forms">
+                <div class="col-md-6">
+                  <h5>새주소</h5>
+										<h6>주소 찾기 클릭</h6>
+										<input type="text" class="address" name="suk_address" id="suk_address" value=""
+											readonly="readonly">
+								
+				
+										<input type="button" onclick="sample2_execDaumPostcode()"
+											value="주소찾기" id="suk_address2">
+										<script
+											src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+										<div id="layer"
+											style="display: none; position: fixed; overflow: hidden; z-index: 1; -webkit-overflow-scrolling: touch;">
+											<img
+												src="//t1.daumcdn.net/postcode/resource/images/close.png"
+												id="btnCloseLayer"
+												style="cursor: pointer; position: absolute; right: -3px; top: -3px; z-index: 1"
+												onclick="closeDaumPostcode()" alt="닫기 버튼">
+										</div>
+
+										<script>
+											// 우편번호 찾기 화면을 넣을 element
+											var element_layer = document
+													.getElementById('layer');
+
+											function closeDaumPostcode() {
+												// iframe을 넣은 element를 안보이게 한다.
+												element_layer.style.display = 'none';
+											}
+
+											function sample2_execDaumPostcode() {
+												new daum.Postcode(
+														{
+															oncomplete : function(
+																	data) {
+																// 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+																// 각 주소의 노출 규칙에 따라 주소를 조합한다.
+																// 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+																var addr = ''; // 주소 변수
+																var extraAddr = ''; // 참고항목 변수
+
+																//사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+																if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+																	addr = data.roadAddress;
+																} else { // 사용자가 지번 주소를 선택했을 경우(J)
+																	addr = data.jibunAddress;
+																}
+
+																// 우편번호와 주소 정보를 해당 필드에 넣는다.
+
+																document
+																		.getElementById("suk_address").value = addr;
+
+											
+
+																// iframe을 넣은 element를 안보이게 한다.
+																// (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+																element_layer.style.display = 'none';
+															},
+															width : '100%',
+															height : '100%',
+															maxSuggestItems : 5
+														}).embed(element_layer);
+
+												// iframe을 넣은 element를 보이게 한다.
+												element_layer.style.display = 'block';
+
+												// iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+												initLayerPosition();
+											}
+
+											// 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
+											// resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
+											// 직접 element_layer의 top,left값을 수정해 주시면 됩니다.
+											function initLayerPosition() {
+												var width = 400; //우편번호서비스가 들어갈 element의 width
+												var height = 400; //우편번호서비스가 들어갈 element의 height
+												var borderWidth = 5; //샘플에서 사용하는 border의 두께
+
+												// 위에서 선언한 값들을 실제 element에 넣는다.
+												element_layer.style.width = width
+														+ 'px';
+												element_layer.style.height = height
+														+ 'px';
+												element_layer.style.border = borderWidth
+														+ 'px solid';
+												// 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
+												element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width) / 2 - borderWidth)
+														+ 'px';
+												element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height) / 2 - borderWidth)
+														+ 'px';
+											}
+										</script>
+                </div>
+              </div>
+                
+              <div class="row with-forms">
+                <div class="col-md-6">
+                  <h5>침대 개수</h5>
+                  <input type="number" name="suk_bed" id="suk_bed" value="" >
+                </div>
+   
+                <div class="col-md-6">
+                  <h5>주방</h5>
+                 <select name="suk_kitchin" data-selected-text-format="count" data-size="2">
+                    <option value=0 th:selected="${suk_kitchin==0}">가능</option>
+                    <option value=1 th:selected="${suk_kitchin==1}">불가</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row with-forms">
+                <div class="col-md-6">
+                  <h5>bbq 가능여부</h5>
+                  <select name="suk_bbq" data-selected-text-format="count" data-size="2">
+                    <option value=0 th:selected="${suk_bbq==0}">가능</option>
+                    <option value=1 th:selected="${suk_bbq==1}">불가</option>
+                  </select>
+                </div>
+         
+                <div class="col-md-6">
+                  <h5>엘리베이터 유무</h5>
+                  <select name="suk_elev" data-selected-text-format="count" data-size="2">
+                    <option value=0 th:selected="${suk_elev==0}">무</option>
+                    <option value=1 th:selected="${suk_elev==1}">유</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row with-forms">
+                <div class="col-md-6">
+                  <h5>애완동물 허가</h5>
+                  <select name="suk_pet" data-selected-text-format="count" data-size="2">
+                    <option value=0 th:selected="${suk_pet==0}">불가</option>
+                    <option value=1 th:selected="${suk_pet==1}">가능</option>
+                  </select>
+                </div>
+              
+                <div class="col-md-6">
+                  <h5>층수</h5>
+                  <input type="number" name="suk_floor" id="suk_floor" value="" required>
+                </div>
+              </div>
+              <div class="row with-forms">
+                <div class="col-md-6">
+                  <h5>CCTV 유무</h5>
+                  <select name="suk_cctv" data-selected-text-format="count" data-size="2">
+                    <option value="0" th:selected="${suk_cctv==0}">없음</option>
+                    <option value="1" th:selected="${suk_cctv==1}">있음</option>
+                  </select>
+                </div>
+            
+                <div class="col-md-6">
+                  <h5>WIFI</h5>
+                  <select name="suk_wifi" data-selected-text-format="count" data-size="2">
+                    <option value=0 th:selected="${suk_wifi==0}">무</option>
+                    <option value=1 th:selected="${suk_wifi==1}">유</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row with-forms">
+                <div class="col-md-6">
+                  <h5>화장실 개수</h5>
+                  <input type="number" name="suk_restroom" id="suk_restroom" value="" required>
+                </div>
+      
+                <div class="col-md-6">
+                  <h5>주차장</h5>
+                  <select name="suk_parking" data-selected-text-format="count" data-size="2">
+                    <option value=0 th:selected="${suk_parking==0}">무</option>
+                    <option value=1 th:selected="${suk_parking==1}">유</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row with-forms">
+                <div class="col-md-6">
+                  <h5>세탁기구</h5>
+                  <select name="suk_laundary" data-selected-text-format="count" data-size="2" title="성별">
+                    <option value=0 th:selected="${suk_laundary==0}">무</option>
+                    <option value=1 th:selected="${suk_laundary==1}">유</option>
+                  </select>
+                </div>
+     
+                <div class="col-md-6">
+                  <h5>비용</h5>
+                    <input type="number" name="suk_price1" id="suk_price1" value="" required>
+                </div>
+              </div>
+              
+              <div class="row with-forms">
+                <div class="col-md-6">
+                  <h5>행정구역</h5>
+              <select name="suk_location" id="suk_location">
+											<option value='서울특별시' th:selected="${suk_location=='서울특별시'}">서울특별시</option>
+											<option value='경기도' th:selected="${suk_location=='경기도'}">경기도</option>
+											<option value='강원도' th:selected="${suk_location=='강원도'}">강원도</option>
+											<option value='충청북도' th:selected="${suk_location=='충청북도'}">충청북도</option>
+											<option value='충청남도' th:selected="${suk_location=='충청남도'}">충청남도</option>
+											<option value='전라북도' th:selected="${suk_location=='전라북도'}">전라북도</option>
+											<option value='전라남도' th:selected="${suk_location=='전라남도'}">전라남도</option>
+											<option value='경상북도' th:selected="${suk_location=='경상북도'}">경상북도</option>
+											<option value='경상남도' th:selected="${suk_location=='경상남도'}">경상남도</option>
+											<option value='제주특별자치시' th:selected="${suk_location=='제주특별자치시'}">제주특별자치시</option>
+										</select>
+                </div>
+     
+                <div class="col-md-6">
+                  <h5>주변환경</h5>
+                   <select  name="suk_nearby" id="suk_nearby">
+											<option value='바다' th:selected="${suk_nearby == '바다'}">바다</option>
+							<option value='산' th:selected="${suk_nearby == '산'}">산</option>
+							<option value='강' th:selected="${suk_nearby == '강'}">강</option>
+							<option value='도심' th:selected="${suk_nearby == '도심'}">도심</option>
+					    	<option value='하천' th:selected="${suk_nearby == '하천'}">하천</option>
+										</select>
+                </div>
+              </div>
+              
+               <div class="row with-forms">
+                <div class="col-md-6">
+                  <h5>최대인원수</h5>
+                   <input type="number" name="suk_maxmember" id="suk_maxmember"value="" required>
+                </div>
+              </div>
+            
+              
+              <div class="row with-forms">
+                <div class="col-md-6">
+                  <h5>공지사항</h5>
+                  <textarea name="suk_notice" id="suk_notice" cols="40" rows="2" required></textarea>
+                </div>
+              </div>
+              <div class="row with-forms">
+                <div class="col-md-6">
+                <h5> 검색 시 사용될 태그 입력란(최대 5개) </h5>
+                  <p style="color: rgba(113, 113, 47, 0.867);">
+                  ◇ 한번 설정 시 변경이 불가하므로 신중히 입력 ! ◇</p>
+                  <p><input name="tags" id="tags" placeholder="검색될 때 사용될 숙소 태그를 입력하세요!"></p>
+                </div>
+              </div>
+              <div class="row with-forms">
+                <div class="col-md-6">
+                  <h5>사진등록</h5>
+                  <input type="file" name="upload" id="main_upload" class="upload" required>
+                </div>
+                <div class="col-md-6">
+                  <h5>서브 사진 등록</h5>
+                  <input type="file" name="upload1" class="upload" multiple>
+                </div>
+              </div>
+              <input class="button preview" type="submit" value="등록" />
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+      
+      <!-- Scripts -->
+      <script src="../scripts/jquery-3.4.1.min.js"></script>
+      <script src="../scripts/chosen.min.js"></script>
+      <script src="../scripts/slick.min.js"></script>
+      <script src="../scripts/rangeslider.min.js"></script>
+      <script src="../scripts/bootstrap-select.min.js"></script>
+      <script src="../scripts/magnific-popup.min.js"></script>
+      <script src="../scripts/jquery-ui.min.js"></script>
+      <script src="../scripts/mmenu.js"></script>
+      <script src="../scripts/tooltips.min.js"></script>
+      <script src="../scripts/jquery_custom.js"></script>
+      <!-- Maps -->
+      <script src="http://maps.google.com/maps/api/js?sensor=false&amp;language=en"></script>
+      <script src="../scripts/infobox.min.js"></script>
+      <script src="../scripts/markerclusterer.js"></script>  
+      <script src="../scripts/maps.js"></script>
+      <script>
+        $(".utf_opening_day.utf_js_demo_hours .utf_chosen_select").each(function () {
+          $(this).append('' +
+            '<option></option>' +
+            '<option>Closed</option>' +
+            '<option>1 AM</option>' +
+            '<option>2 AM</option>' +
+            '<option>3 AM</option>' +
+            '<option>4 AM</option>' +
+            '<option>5 AM</option>' +
+            '<option>6 AM</option>' +
+            '<option>7 AM</option>' +
+            '<option>8 AM</option>' +
+            '<option>9 AM</option>' +
+            '<option>10 AM</option>' +
+            '<option>11 AM</option>' +
+            '<option>12 AM</option>' +
+            '<option>1 PM</option>' +
+            '<option>2 PM</option>' +
+            '<option>3 PM</option>' +
+            '<option>4 PM</option>' +
+            '<option>5 PM</option>' +
+            '<option>6 PM</option>' +
+            '<option>7 PM</option>' +
+            '<option>8 PM</option>' +
+            '<option>9 PM</option>' +
+            '<option>10 PM</option>' +
+            '<option>11 PM</option>' +
+            '<option>12 PM</option>');
+        });
+      </script>
+      <script src="../scripts/dropzone.js"></script>
+</body>
+
+</html>

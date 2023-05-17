@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+<meta name="author" content="">
+<meta name="description" content="">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> 이용객 예약 확인 </title>
+<!-- Favicon -->
+<link rel="shortcut icon" href="images/favicon.png">
+<!-- Style CSS -->
+<link rel="stylesheet" href="../css/stylesheet.css">
+<link rel="stylesheet" href="../css/mmenu.css">
+<link rel="stylesheet" href="../css/style.css" id="colors">
+<!-- Google Font -->
+<link
+	href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800&display=swap&subset=latin-ext,vietnamese"
+	rel="stylesheet">
+<link
+	href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700,800"
+	rel="stylesheet" type="text/css">
+<style>
+body {
+	padding: 1.5em;
+	background: #f5f5f5
+}
+
+table {
+	border: 1px #a39485 solid;
+	font-size: .9em;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, .25);
+	width: 100%;
+	border-collapse: collapse;
+	border-radius: 5px;
+	overflow: hidden;
+}
+
+th {
+	text-align: left;
+}
+
+thead {
+	font-weight: bold;
+	color: #fff;
+	background: #73685d;
+}
+
+td, th {
+	padding: 1em .5em;
+	vertical-align: middle;
+}
+
+td {
+	border-bottom: 1px solid rgba(0, 0, 0, .1);
+	background: #fff;
+}
+
+a {
+	color: #73685d;
+}
+
+@media all and (max-width: 768px) {
+	table, thead, tbody, th, td, tr {
+		display: block;
+	}
+	th {
+		text-align: right;
+	}
+	table {
+		position: relative;
+		padding-bottom: 0;
+		border: none;
+		box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+	}
+	thead {
+		float: left;
+		white-space: nowrap;
+	}
+	tbody {
+		overflow-x: auto;
+		overflow-y: hidden;
+		position: relative;
+		white-space: nowrap;
+	}
+	tr {
+		display: inline-block;
+		vertical-align: top;
+	}
+	th {
+		border-bottom: 1px solid #a39485;
+	}
+	td {
+		border-bottom: 1px solid #e5e5e5;
+	}
+}
+</style>
+<style>
+#aaaaaa {
+	background: #ffffff;
+	padding:30px 20px;
+	padding-top: 0;
+	text-align: left;
+	max-width: 450px;
+	margin: 20px auto;
+	position: relative;
+	box-sizing: border-box;
+	border-radius: 4px;
+}
+
+
+
+
+
+
+</style>
+
+
+
+<!--  <script>
+function trans(){
+	let suk_price1 = $('#bs.suk_price1').val();
+	let suk_num = $('#bs.suk_num1').val();
+	let res_num = $('#bs.res_num1').val();
+	
+	document.getElementById('suk_price1').value = suk_price1
+	document.getElementById('suk_num1').value = suk_num
+	document.getElementById('res_num1').value = res_num
+	document.getElementById("priceper").innerText = "결제금액: " + suk_price1;
+} 
+
+
+</script> -->
+
+</head>
+<body>
+
+<div class="errorMsg" th:if="${errorMSG}"><script>alert('예약일이 이미 존재합니다. 다른 날짜를 선택해주세요.')</script></div>
+	<!-- Preloader Start -->
+	<div class="preloader">
+		<div class="utf-preloader">
+			<span></span> <span></span> <span></span>
+		</div>
+	</div>
+	<!-- Preloader End -->
+	<!-- Wrapper -->
+	<div id="main_wrapper">
+		<header id="header_part" class="fullwidth">
+			<div id="header">
+				<div class="container">
+					<div class="utf_left_side">
+						<div id="logo">
+							<a th:href="@{/}">PickPick</a>
+						</div>
+						<div class="mmenu-trigger">
+							<button class="hamburger utfbutton_collapse" type="button">
+								<span class="utf_inner_button_box"> <span
+									class="utf_inner_section"></span>
+								</span>
+							</button>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+					<div class="utf_right_side">
+						<div class="header_widget"></div>
+					</div>
+
+				</div>
+			</div>
+
+
+
+		</header>
+
+		<div class="clearfix"></div>
+		<div class="container">
+
+			<div class="row utf_sticky_main_wrapper"
+				style="display: flex; justify-content: center;" th:each="bs:${bs}">
+				<div class="col-lg-8 col-md-8">
+					<div id="titlebar" class="utf_listing_titlebar">
+						<div class="utf_listing_titlebar_title" >
+							<h3>내 예약</h3>
+							<p>
+								<span>예약번호 : </span><span th:text="${bs.res_num}"></span>
+								<input type="hidden" id="bs.res_num1" th:value="${bs.res_num}">
+							</p>
+							<p>
+							<span>예약 날짜 : </span><span th:text="${bs.res_resdate}"></span> ~ <span th:text="${bs.res_outdate}">~</span>
+							</p>
+							
+							<p>
+								<span>예약숙소번호 : </span><span th:text="${bs.suk_num}"></span>
+								<input type="hidden" id="bs.suk_num1" th:value="${bs.suk_num}">
+								<input type="hidden" id="bs.suk_price1" th:value="${bs.suk_price1}">
+							</p>
+							<p>
+								<span>숙소이름 : </span><span th:text="${bs.suk_name}"></span>
+							</p>
+							<p>
+								<span>관리자이름 : </span><span th:text="${bs.mem_nickname}"></span>
+							</p>
+							<p>
+								<span>관리자에게 남긴 메시지 : </span><span th:text="${bs.res_message}"></span>
+							</p>
+							<p>
+								<span>주소 : </span><span th:text="${bs.suk_address}"></span>
+							</p>
+
+
+							<!--       <ul class="utf_listing_features checkboxes margin-top-0">
+                <li>침대수 : <span th:text="${PP_suk_spec.suk_bed}"
+                    th:if="${PP_suk_spec.suk_bed} != null else 'N/A'"></span></li>
+                <li>침실수 : <span th:text="${PP_suk_spec.suk_restroom}"
+                    th:if="${PP_suk_spec.suk_bed} != null else 'N/A'"></span></li>
+                <li>주차장 : <span th:text="${PP_suk_spec.suk_parking}"
+                    th:if="${PP_suk_spec.suk_bed} != null else 'N/A'"></span></li>
+                <li>주방 : <span th:text="${PP_suk_spec.suk_kitchin}"
+                    th:if="${PP_suk_spec.suk_bed} != null else 'N/A'"></span></li>
+                <li>야외 바바큐 : <span th:text="${PP_suk_spec.suk_bbq}"
+                    th:if="${PP_suk_spec.suk_bed} != null else 'N/A'"></span></li>
+                <li>cctv : <span th:text="${PP_suk_spec.suk_cctv}"
+                    th:if="${PP_suk_spec.suk_bed} != null else 'N/A'"></span></li>
+                <li>애완동물 : <span th:text="${PP_suk_spec.suk_pet}"
+                    th:if="${PP_suk_spec.suk_bed} != null else 'N/A'"></span></li>
+                <li>층수 : <span th:text="${PP_suk_spec.suk_floor}"
+                    th:if="${PP_suk_spec.suk_bed} != null else 'N/A'"></span></li>
+                <li>엘레베이터 : <span th:text="${PP_suk_spec.suk_elev}"
+                    th:if="${PP_suk_spec.suk_bed} != null else 'N/A'"></span></li>
+                <li>와이파이 : <span th:text="${PP_suk_spec.suk_wifi}"
+                    th:if="${PP_suk_spec.suk_bed} != null else 'N/A'"></span></li>
+                <li>세탁시설 : <span th:text="${PP_suk_spec.suk_laundary}"
+                    th:if="${PP_suk_spec.suk_bed} != null else 'N/A'"></span></li>
+              </ul> -->
+
+							<ul class="listing_item_social">
+								<!--   <li><a href="#">호스트와의 채팅</a></li> -->
+								<li><a th:href="@{/sukso/read(num=${bs.suk_num})}">상세정보</a></li>
+								<li><a href="#dialog_signin_part"
+										class="sign-in popup-with-zoom-anim">예약수정</a></li>
+
+
+
+
+
+								<!--     <li><a th:href="@{/book/read(num=${bs.suk_num})}">예약수정</a></li> -->
+								<li><a th:href="@{/book/cancer(num=${bs.res_num})}">예약취소</a></li>
+								<!--       <li><a href="#">리뷰하기</a></li> -->
+								<li><a href="#">신고하기</a></li>
+							</ul>
+						</div>
+					</div>
+
+				</div>
+		
+			<div id="dialog_signin_part" class="zoom-anim-dialog mfp-hide">
+									<div class="small_dialog_header">
+										<h3 th:text="${bs.suk_price1}">예약수정</h3>
+									</div>
+									
+
+
+										<div class="tab_container alt">
+											<div class="tab_content"  style="display: none;">
+												<form method="post" th:action="@{/book/updateRes}">
+
+
+													<div class="utf_box_widget booking_widget_box">
+														<h3>
+															<i class="fa fa-calendar"></i>
+															<div class="price">
+																<span>
+															   <a th:text="${bs.suk_price1}">결제금액: </a>
+																	</a>원<small>인수당</small>
+																</span>
+																 <input type="hidden" name="suk_price" id="suk_price1" th:value="${bs.suk_price1}">
+															</div>
+														</h3>
+
+														<div class="row with-forms margin-top-0">
+															<div class="col-lg-12 col-md-12 select_date_box">
+																<input type="text" id="date-picker"
+																	placeholder="Select Date" readonly="readonly" >
+																<i class="fa fa-calendar"></i>
+															</div>
+															<input type="hidden" name="res_resdate" id="res_resdate"
+																value=""> <input type="hidden"
+																name="res_outdate" id="res_outdate" value="">
+														</div>
+														<div class="row with-forms">
+															<div class="col-lg-12">
+																<div class="panel-dropdown">
+																	<a href="#">투숙객 <span class="qtyTotal" id="res_pop">1</span></a>
+
+																	<div class="panel-dropdown-content">
+																		<div class="qtyButtons">
+																			<div class="qtyTitle">투숙인원 수</div>
+																			<input type="number" min="1" name="qtyInput"
+																				value="1" id="qtyInput">
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+
+														<div class="row with-forms margin-top-0">
+															<div class="col-lg-12 col-md-12">
+																<select name="res_pet" class="utf_chosen_select_single">
+																	<option label="Select Room">애완동물 동반</option>
+																	<option value=0 th:selected="${res_pet==0}">yes</option>
+																	<option value=1 th:selected="${res_pet==1}">no</option>
+
+																</select>
+															</div>
+														</div>
+
+														<div class="row with-forms margin-top-0">
+															<div class="col-lg-12 col-md-12">
+																<select name="res_parking"
+																	class="utf_chosen_select_single">
+																	<option label="Select Room">주차장 사용여부</option>
+																	<option value=0 th:selected="${res_parking==0}">사용</option>
+																	<option value=1 th:selected="${res_parking==1}">사용안함</option>
+																</select>
+															</div>
+														</div>
+
+														<div class="row with-forms margin-top-0">
+															<div class="col-lg-12 col-md-12">
+																<textarea name="res_message" id="" cols="30" rows="10"
+																	placeholder="host에게 전할 말" style="height: 100px;"></textarea>
+															</div>
+														</div>
+														 <input type="hidden" name="res_num" id="res_num" th:value=${bs.res_num} > 
+														 <input type="hidden" name="suk_num" id="suk_num" th:value=${bs.suk_num} > 
+														<input type="submit"
+															class="utf_progress_button button fullwidth_block margin-top-5"
+															value="예약수정하기"></input>
+
+
+														<div class="clearfix"></div>
+
+
+													</div>
+												</form>
+											</div>
+
+
+
+										</div>
+									
+							
+</div>
+			
+								
+	</div>
+				
+			
+		
+               
+
+			<div id="utf_listing_reviews" class="utf_listing_section">
+				<h3 class="utf_listing_headline_part margin-top-75 margin-bottom-20">과거내역</h3>
+				<div class="clearfix"></div>
+				<div class="comments utf_listing_reviews">
+					<table>
+						<thead>
+							<tr>
+								<th>날짜</th>
+								<th>숙소이름</th>
+								<th>금액</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="res:${res}">
+								<td><span th:text="${res.res_resdate}"></span><span
+									th:text="${res.res_outdate}"></span></td>
+								<td><a th:text="${res.suk_num}"></a></td>
+								<td><p th:text="${res.res_price}"></p></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="clearfix"></div>
+			</div>
+		</div>
+	</div>
+	</div>
+	</div>
+	<!-- Scripts -->
+	<script src="../scripts/jquery-3.4.1.min.js"></script>
+	<script src="../scripts/chosen.min.js"></script>
+	<script src="../scripts/slick.min.js"></script>
+	<script src="../scripts/rangeslider.min.js"></script>
+	<script src="../scripts/magnific-popup.min.js"></script>
+	<script src="../scripts/jquery-ui.min.js"></script>
+	<script src="../scripts/mmenu.js"></script>
+	<script src="../scripts/tooltips.min.js"></script>
+	<script src="../scripts/color_switcher.js"></script>
+	<script src="../scripts/jquery_custom.js"></script>
+	<!-- Maps -->
+
+	<script src="../scripts/infobox.min.js"></script>
+	<script src="../scripts/markerclusterer.js"></script>
+	<script src="../scripts/maps.js"></script>
+	<script src="../scripts/quantityButtons.js"></script>
+	<script src="../scripts/moment.min.js"></script>
+	<script src="../scripts/daterangepicker.js"></script>
+	<script>
+		$(function() {
+			$('#date-picker').daterangepicker(
+					{
+						"opens" : "left",
+						// singleDatePicker: true,
+						isInvalidDate : function(date) {
+							var disabled_start = moment('09/02/2018',
+									'DD/MM/YYYY');
+							var disabled_end = moment('06/09/2018',
+									'DD/MM/YYYY');
+							return date.isAfter(disabled_start)
+									&& date.isBefore(disabled_end);
+						}
+					}, function(start, end, label) {
+						$('#res_resdate').val(start.format('YYYY-MM-DD'));
+						$('#res_outdate').val(end.format('YYYY-MM-DD'));
+					});
+		});
+
+		$('#date-picker').on('showCalendar.daterangepicker',
+				function(ev, picker) {
+					$('.daterangepicker').addClass('calendar-animated');
+				});
+		$('#date-picker').on('show.daterangepicker', function(ev, picker) {
+			$('.daterangepicker').addClass('calendar-visible');
+			$('.daterangepicker').removeClass('calendar-hidden');
+		});
+		$('#date-picker').on('hide.daterangepicker', function(ev, picker) {
+			$('.daterangepicker').removeClass('calendar-visible');
+			$('.daterangepicker').addClass('calendar-hidden');
+		});
+
+		function close_panel_dropdown() {
+			$('.panel-dropdown').removeClass("active");
+			$('.fs-inner-container.content').removeClass("faded-out");
+		}
+		$('.panel-dropdown a').on('click', function(e) {
+			if ($(this).parent().is(".active")) {
+				close_panel_dropdown();
+			} else {
+				close_panel_dropdown();
+				$(this).parent().addClass('active');
+				$('.fs-inner-container.content').addClass("faded-out");
+			}
+			e.preventDefault();
+		});
+		$('.panel-buttons button').on('click', function(e) {
+			$('.panel-dropdown').removeClass('active');
+			$('.fs-inner-container.content').removeClass("faded-out");
+		});
+		var mouse_is_inside = false;
+		$('.panel-dropdown').hover(function() {
+			mouse_is_inside = true;
+		}, function() {
+			mouse_is_inside = false;
+		});
+		$("body").mouseup(function() {
+			if (!mouse_is_inside)
+				close_panel_dropdown();
+		});
+	</script>
+</body>
+
+</html>

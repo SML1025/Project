@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org"
+   xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta name="author" content="">
+<meta name="description" content="">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> PickPick 번개게시판 </title>
+<!-- Favicon -->
+<link rel="shortcut icon" href="../images/favicon.png">
+<!-- Style CSS -->
+<link rel="stylesheet" href="../css/stylesheet.css">
+<link rel="stylesheet" href="../css/mmenu.css">
+<link rel="stylesheet" href="../css/style.css" id="colors">
+<!-- Google Font -->
+<link
+   href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800&display=swap&subset=latin-ext,vietnamese"
+   rel="stylesheet">
+<link
+   href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700,800"
+   rel="stylesheet" type="text/css">
+<style type="text/css">
+table {
+   border: 1px #a39485 solid;
+   font-size: .9em;
+   box-shadow: 0 2px 5px rgba(0, 0, 0, .25);
+   width: 100%;
+   border-collapse: collapse;
+   border-radius: 5px;
+   overflow: hidden;
+}
+
+th {
+   text-align: left;
+}
+
+thead {
+   font-weight: bold;
+   color: #fff;
+   background: #73685d;
+}
+
+td, th {
+   padding: 1em .5em;
+   vertical-align: middle;
+}
+
+td {
+   border-bottom: 1px solid rgba(0, 0, 0, .1);
+   background: #fff;
+}
+
+a {
+   color: #73685d;
+}
+
+@media all and (max-width: 768px) {
+   table, thead, tbody, th, td, tr {
+      display: block;
+   }
+   th {
+      text-align: right;
+   }
+   table {
+      position: relative;
+      padding-bottom: 0;
+      border: none;
+      box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+   }
+   thead {
+      float: left;
+      white-space: nowrap;
+   }
+   tbody {
+      overflow-x: auto;
+      overflow-y: hidden;
+      position: relative;
+      white-space: nowrap;
+   }
+   tr {
+      display: inline-block;
+      vertical-align: top;
+   }
+   th {
+      border-bottom: 1px solid #a39485;
+   }
+   td {
+      border-bottom: 1px solid #e5e5e5;
+   }
+}
+
+.modal {
+   display: none;
+   position: fixed;
+   z-index: 1;
+   left: 0;
+   top: 0;
+   width: 100%;
+   height: 100%;
+   overflow: auto;
+   background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+   background-color: #fefefe;
+   margin: 15% auto;
+   padding: 20px;
+   border: 1px solid #888;
+   width: 80%;
+}
+
+.close {
+   color: #aaa;
+   float: right;
+   font-size: 28px;
+   font-weight: bold;
+}
+
+.close:hover, .close:focus {
+   color: black;
+   text-decoration: none;
+   cursor: pointer;
+}
+</style>
+<!-- <script>
+   function bungWrite() {
+      window.location.href = "bungWrite";
+   }
+   function titleLink(data) {
+      // suk_num 값을 가져옴
+      alert(data)
+      
+      var suk_num = data;
+      alert(suk_num)
+      console.log("suk_num : ", suk_num)
+      $.ajax({
+         type : 'POST', // 데이터 전송 방식 (POST 또는 GET)
+         url : 'getAddress', // 서버 컨트롤러 메소드 경로 (suk_num 값을 URL에 추가)
+         data : {
+            suk_num : suk_num
+         },
+         dataType : 'json',
+         success : function(response) {
+            
+            // 서버에서 받은 데이터(data)를 처리
+            // suk_address 값을 사용하여 원하는 동작 수행
+            console.log('서버에서 받은 데이터:', response);
+
+            // 서버에서 받은 데이터 중 suk_address 값을 가져와서 사용
+            var suk_address = response.suk_address;
+            console.log('JSsuk_address 값:', suk_address);
+               
+            /*$('#suk_address').text(suk_address);*/
+ 
+            // 원하는 동작 수행
+            
+         },
+         error : function(xhr, status, error) {
+            // 에러 발생 시 처리
+            console.error('서버 요청 에러:', error);
+         }
+      });
+   }
+</script> -->
+<script>
+   function sendMSG() {
+      window.location.href = "sendMsg";
+   }
+</script>
+</head>
+<body>
+   <!-- Preloader Start -->
+   <div class="preloader">
+      <div class="utf-preloader">
+         <span></span> <span></span> <span></span>
+      </div>
+   </div>
+   <!-- Preloader End -->
+   <!-- Wrapper -->
+   <div id="wrapper" class="mm-page mm-slideout">
+      <header id="header_part" class="header_item_half fullwidth">
+         <div id="header">
+            <div class="container">
+               <div class="utf_left_side">
+                  <div id="logo">
+                     <a th:href="@{/}">PickPick</a>
+                  </div>
+                  <div class="mmenu-trigger">
+                     <button class="hamburger utfbutton_collapse" type="button">
+                        <span class="utf_inner_button_box"> <span
+                           class="utf_inner_section"></span>
+                        </span>
+                     </button>
+                  </div>
+                  <div class="clearfix"></div>
+               </div>
+               <!-- 우측 상단 알림, 네비게이션 -->
+               <div class="utf_right_side">
+                  <div class="header_widget">
+                     <div class="dashboard_header_button_item has-noti js-item-menu">
+                        <i class="sl sl-icon-bell"></i>
+                        <div class="dashboard_notifi_dropdown js-dropdown">
+                           <div class="dashboard_notifi_title">
+                              <p>You Have 2 Notifications</p>
+                           </div>
+                           <div class="dashboard_notifi_item">
+                              <div class="bg-c1 red">
+                                 <i class="fa fa-check"></i>
+                              </div>
+                              <div class="content">
+                                 <p>
+                                    Your Listing <b>Burger House (MG Road)</b> Has Been
+                                    Approved!
+                                 </p>
+                                 <span class="date">2 hours ago</span>
+                              </div>
+                           </div>
+                           <div class="dashboard_notifi_item">
+                              <div class="bg-c1 green">
+                                 <i class="fa fa-envelope"></i>
+                              </div>
+                              <div class="content">
+                                 <p>You Have 7 Unread Messages</p>
+                                 <span class="date">5 hours ago</span>
+                              </div>
+                           </div>
+                           <div class="dashboard_notify_bottom text-center pad-tb-20">
+                              <a href="#">View All Notification</a>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="utf_user_menu">
+                        <div class="utf_user_name">
+                           <span><img src="images/dashboard-avatar.jpg" alt=""></span>Hi,
+                           John!
+                        </div>
+                        <ul>
+                           <li><a href="dashboard.html"><i
+                                 class="sl sl-icon-layers"></i> Dashboard</a></li>
+                           <li><a href="dashboard_my_profile.html"><i
+                                 class="sl sl-icon-user"></i> My Profile</a></li>
+                           <li><a href="dashboard_my_listing.html"><i
+                                 class="sl sl-icon-list"></i> My Listing</a></li>
+                           <li><a href="dashboard_messages.html"><i
+                                 class="sl sl-icon-envelope-open"></i> Messages</a></li>
+                           <li><a href="dashboard_bookings.html"><i
+                                 class="sl sl-icon-docs"></i> Booking</a></li>
+                           <li><a href="index_1.html"><i class="sl sl-icon-power"></i>
+                                 Logout</a></li>
+                        </ul>
+                     </div>
+                  </div>
+               </div>
+               <div id="dialog_signin_part" class="zoom-anim-dialog mfp-hide">
+                  <div class="small_dialog_header">
+                     <h3>Sign In</h3>
+                  </div>
+                  <div class="utf_signin_form style_one">
+                     <ul class="utf_tabs_nav">
+                        <li class=""><a href="#tab1">Log In</a></li>
+                        <li><a href="#tab2">Register</a></li>
+                     </ul>
+                     <div class="tab_container alt">
+                        <div class="tab_content" id="tab1" style="display: none;">
+                           <form method="post" class="login">
+                              <p class="utf_row_form utf_form_wide_block">
+                                 <label for="username"> <input type="text"
+                                       class="input-text" name="username" id="username" value=""
+                                       placeholder="Username" />
+                                 </label>
+                              </p>
+                              <p class="utf_row_form utf_form_wide_block">
+                                 <label for="password"> <input class="input-text"
+                                       type="password" name="password" id="password"
+                                       placeholder="Password" />
+                                 </label>
+                              </p>
+                              <div class="utf_row_form utf_form_wide_block form_forgot_part">
+                                 <span class="lost_password fl_left"> <a
+                                    href="javascript:void(0);">Forgot Password?</a>
+                                 </span>
+                                 <div class="checkboxes fl_right">
+                                    <input id="remember-me" type="checkbox" name="check">
+                                    <label for="remember-me">Remember Me</label>
+                                 </div>
+                              </div>
+                              <div class="utf_row_form">
+                                 <input type="submit" class="button border margin-top-5"
+                                    name="login" value="Login" />
+                              </div>
+                              <div class="utf-login_with my-3">
+                                 <span class="txt">Or Login in With</span>
+                              </div>
+                              <div class="row">
+                                 <div class="col-md-6 col-6">
+                                    <a href="javascript:void(0);"
+                                       class="social_bt facebook_btn mb-0"><i
+                                       class="fa fa-facebook"></i> Facebook</a>
+                                 </div>
+                                 <div class="col-md-6 col-6">
+                                    <a href="javascript:void(0);"
+                                       class="social_bt google_btn mb-0"><i
+                                       class="fa fa-google"></i> Google</a>
+                                 </div>
+                              </div>
+                           </form>
+                        </div>
+                        <div class="tab_content" id="tab2" style="display: none;">
+                           <form method="post" class="register">
+                              <p class="utf_row_form utf_form_wide_block">
+                                 <label for="username2"> <input type="text"
+                                       class="input-text" name="username" id="username2" value=""
+                                       placeholder="Username" />
+                                 </label>
+                              </p>
+                              <p class="utf_row_form utf_form_wide_block">
+                                 <label for="email2"> <input type="text"
+                                       class="input-text" name="email" id="email2" value=""
+                                       placeholder="Email" />
+                                 </label>
+                              </p>
+                              <p class="utf_row_form utf_form_wide_block">
+                                 <label for="password1"> <input class="input-text"
+                                       type="password" name="password1" id="password1"
+                                       placeholder="Password" />
+                                 </label>
+                              </p>
+                              <p class="utf_row_form utf_form_wide_block">
+                                 <label for="password2"> <input class="input-text"
+                                       type="password" name="password2" id="password2"
+                                       placeholder="Confirm Password" />
+                                 </label>
+                              </p>
+                              <input type="submit" class="button border fw margin-top-10"
+                                 name="register" value="Register" />
+                           </form>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </header>
+   </div>
+   <div class="clearfix"></div>
+   <div class="fs-container">
+      <div class="fs-inner-container content">
+         <div class="fs-content">
+            <div class="search">
+               <div class="row">
+                  <div class="col-md-12">
+                     <form action="bungSearch" method="post" id="search-form">
+                        <div class="row with-forms">
+                           <div class="col-fs-6">
+                              <div class="input-with-icon" style="display: flex;">
+                                 <!-- 검색창 -->
+                                 <input type="button" onclick="bungWrite()"
+                                    style="width: auto; height: auto; background-color: #ff2222; color: white;"
+                                    value="글쓰기">
+                              </div>
+                           </div>
+                        </div>
+                     </form>
+                  </div>
+               </div>
+            </div>
+            <section class="listings-container margin-top-30">
+               <div class="row fs-switcher"></div>
+               <div class="row fs-listings">
+                  <div class="col-lg-12 col-md-12" id="post-list">
+                     <div class="utf_listing_item-container list-layout">
+                        <!-- HTML 테이블 부분 -->
+                        <table>
+                           <thead>
+                              <tr>
+                                 <th>카테고리</th>
+                                 <th>제목</th>
+                                 <th>작성자</th>
+                                 <th>입력시간</th>
+                                 <th>내용보기</th>
+                                 <th>메시지보내기</th>
+                              </tr>
+                           </thead>
+                           <tbody th:each="bung:${bungList}">
+                              <tr>
+                                 <td th:if="${bung.bung_cate=='food'}">같이 먹어요</td>
+                                 <td th:if="${bung.bung_cate=='vehicle'}">같이 타요</td>
+                                 <td th:if="${bung.bung_cate=='activity'}">같이 놀아요</td>
+                                 <td th:if="${bung.bung_cate=='tour'}">같이 관광해요</td>
+                                 <td>
+                                    <a href="#" th:onclick="|titleLink(${bung.suk_num})|"
+                                       th:text="${bung.bung_title}"></a>
+                                    <h1 class="suk_num" th:text="${bung.suk_num}"
+                                       style="display: none;"></h1>
+                                    <input type="hidden" id="x1" name="x1">
+                                    <input type="hidden" id="y1" name="y1">
+                                 </td>
+                                 <td th:text="${bung.mem_id}"></td>
+                                 <td th:text="${bung.bung_inputdate}"></td>
+                                 <td th:text="${bung.bung_contents}"></td>
+                                 <td>
+                                    <a
+                                       th:href="@{/msg/letterMSG1(receiver_mem_id=${bung.mem_id}, suk_num=${bung.suk_num})}">메시지보내기</a>
+                                 </td>
+                              </tr>
+                           </tbody>
+                        </table>
+                     </div>
+                  </div>
+               </div>
+            </section>
+            <div class="clearfix"></div>
+            <div class="col-md-12"></div>
+         </div>
+      </div>
+      <div class="fs-inner-container map-fixed">
+         <div id="utf_single_listing_map_block">
+            <body onload="ka_execDaumPostcode()">
+               <input type="hidden" id="suk_address_js"
+                  th:value="${suk_address_js}">
+               <input type="hidden" id="x" name="x">
+               <div id="map" style="position: relative; overflow: hidden;">
+                  <input type="hidden" id="y" name="y">
+               </div>
+            </body>
+         </div>
+         <script type="text/javascript"
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=16f9cd8afa5170203e0604da861a571c&libraries=services"></script>
+         <script>
+            var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+            addrInput = document.getElementById('suk_address_js'); // 주소를 입력받을 hidden input
+
+            //주소-좌표 변환 객체를 생성
+            var geocoder = new daum.maps.services.Geocoder();
+
+            //초기 지도 중심 좌표
+            var initLatLng = new daum.maps.LatLng(37.537187, 127.005476);
+
+            //지도를 미리 생성
+            var map = new daum.maps.Map(mapContainer, {
+               center : initLatLng,
+               draggable : false,
+               level : 4
+            });
+            //마커를 생성하고 지도에 추가
+            var marker = new daum.maps.Marker({
+               position : initLatLng,
+               map : map
+            });
+            var ps = new kakao.maps.services.Places(map);
+
+            // 인포윈도우를 표시하는 클로저를 만드는 함수입니다 
+            function makeOverListener(map, marker, infowindow) {
+               return function() {
+                  infowindow.open(map, marker);
+               };
+            }
+
+            // 인포윈도우를 닫는 클로저를 만드는 함수입니다 
+            function makeOutListener(infowindow) {
+               return function() {
+                  infowindow.close();
+               };
+            }
+
+            function ka_execDaumPostcode() {
+               // 현재 주소를 가져와서 좌표를 검색하기 위해
+               // 입력 받을 hidden input 필드를 생성하여 값 할당
+               var currentAddr = addrInput.value;
+               if (currentAddr === '') {
+                  currentAddr = '서울특별시 강남구 테헤란로 152';
+               }
+
+               // 주소로 좌표를 검색
+               geocoder.addressSearch(currentAddr, function(results,
+                     status) {
+                  if (status === daum.maps.services.Status.OK) {
+                     // 검색 결과가 있으면 첫번째 결과를 사용
+                     var result = results[0];
+                     var coords = new daum.maps.LatLng(result.y,
+                           result.x);
+
+                     // 지도를 해당 좌표로 이동
+                     map.setCenter(coords);
+                     // 지도에서 해당 좌표에 마커 찍는거.
+                     marker.setPosition(coords);
+
+                     // 주소와 좌표 값을 hidden input 필드에 업데이트
+                     addrInput.value = result.address;
+                     document.getElementById("x").value = result.x;
+                     document.getElementById("y").value = result.y;
+
+                     // 지도를 보여주기 위해 display 속성 변경
+                     mapContainer.style.display = 'block';
+                  } else {
+                     alert('주소 검색 실패: ' + status);
+                  }
+               });
+
+            }
+            function bungWrite() {
+               window.location.href = "bungWrite";
+            }
+            function titleLink(data) {
+
+               // suk_num 값을 가져옴
+
+               var suk_num = data;
+               console.log("suk_num : ", suk_num)
+               $
+                     .ajax({
+                        type : 'POST', // 데이터 전송 방식 (POST 또는 GET)
+                        url : 'getAddress', // 서버 컨트롤러 메소드 경로 (suk_num 값을 URL에 추가)
+                        data : {
+                           suk_num : suk_num
+                        },
+                        dataType : 'json',
+                        success : function(response) {
+
+                           // 서버에서 받은 데이터(data)를 처리
+                           // suk_address 값을 사용하여 원하는 동작 수행
+                           console.log('서버에서 받은 데이터:', response);
+
+                           // 서버에서 받은 데이터 중 suk_address 값을 가져와서 사용
+                           var suk_address = response.suk_address;
+                           var bung_title = response.bung_title;
+                           console
+                                 .log('JSsuk_address 값:',
+                                       suk_address);
+
+                           //$('#suk_address').text(suk_address); 
+
+                           if (suk_address === '') {
+                              suk_address = '서울특별시 강남구 테헤란로 152';
+                           }
+                           console.log('JSsuk_address123 값:',
+                                 suk_address);
+                           // 주소로 좌표를 검색
+                           geocoder
+                                 .addressSearch(
+                                       suk_address,
+                                       function(results, status) {
+                                          if (status === daum.maps.services.Status.OK) {
+                                             // 검색 결과가 있으면 첫번째 결과를 사용
+                                             var result = results[0];
+                                             var coords = new daum.maps.LatLng(
+                                                   result.y,
+                                                   result.x);
+
+                                             // 지도를 해당 좌표로 이동
+
+                                             marker
+                                                   .setPosition(coords);
+
+                                             // 주소와 좌표 값을 hidden input 필드에 업데이트
+                                             suk_address.value = result.address;
+                                             document
+                                                   .getElementById("x1").value = result.x;
+                                             document
+                                                   .getElementById("y1").value = result.y;
+                                             console.log('x 값:',
+                                                   result.x1);
+                                             console.log('y 값:',
+                                                   result.y1);
+
+                                             // 지도를 보여주기 위해 display 속성 변경
+                                             mapContainer.style.display = 'block';
+                                          } else {
+                                             alert('주소 검색 실패: '
+                                                   + status);
+                                          }
+                                       });
+
+                           var positions = [ {
+                              content : bung_title,
+
+                           },
+
+                           ];
+
+                           var imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
+
+                           for (var i = 0; i < positions.length; i++) {
+
+                              // 마커 이미지의 이미지 크기 입니다
+                              var imageSize = new kakao.maps.Size(24,
+                                    35);
+
+                              // 마커 이미지를 생성합니다    
+                              var markerImage = new kakao.maps.MarkerImage(
+                                    imageSrc, imageSize);
+
+                              // 마커를 생성합니다
+                              var marker = new kakao.maps.Marker({
+                                 map : map, // 마커를 표시할 지도
+                                 position : positions[i].latlng, // 마커를 표시할 위치
+                                 title : positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+                                 image : markerImage
+                              // 
+
+                              });
+
+                              // 마커에 표시할 인포윈도우를 생성합니다 
+                              var infowindow = new kakao.maps.InfoWindow(
+                                    {
+                                       content : positions[i].content
+                                    // 인포윈도우에 표시할 내용
+                                    });
+
+                              // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다
+                              // 이벤트 리스너로는 클로저를 만들어 등록합니다 
+                              // for문에서 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
+                              kakao.maps.event.addListener(marker,
+                                    'mouseover',
+                                    makeOverListener(map, marker,
+                                          infowindow));
+                              kakao.maps.event.addListener(marker,
+                                    'mouseout',
+                                    makeOutListener(infowindow));
+                           }
+
+                        },
+                        error : function(xhr, status, error) {
+                           // 에러 발생 시 처리
+                           console.error('서버 요청 에러:', error);
+                        }
+                     });
+            }
+         </script>
+      </div>
+   </div>
+   <!-- Scripts -->
+   <script src="../scripts/jquery-3.4.1.min.js"></script>
+   <script src="../scripts/chosen.min.js"></script>
+   <script src="../scripts/slick.min.js"></script>
+   <script src="../scripts/rangeslider.min.js"></script>
+   <script src="../scripts/bootstrap-select.min.js"></script>
+   <script src="../scripts/magnific-popup.min.js"></script>
+   <script src="../scripts/jquery-ui.min.js"></script>
+   <script src="../scripts/mmenu.js"></script>
+   <script src="../scripts/tooltips.min.js"></script>
+   <script src="../scripts/color_switcher.js"></script>
+   <script src="../scripts/jquery_custom.js"></script>
+</body>
+</html>

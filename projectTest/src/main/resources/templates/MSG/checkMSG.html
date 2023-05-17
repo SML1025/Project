@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+<meta name="author" content="">
+<meta name="description" content="">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>:: U-Listing Directory - Listing HTML Template ::</title>
+<!-- Favicon -->
+<link rel="shortcut icon" href="images/favicon.png">
+<!-- Style CSS -->
+<link rel="stylesheet" href="../css/stylesheet.css">
+<link rel="stylesheet" href="../css/mmenu.css">
+<link rel="stylesheet" href="../css/style.css" id="colors">
+<!-- Google Font -->
+<link
+	href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800&display=swap&subset=latin-ext,vietnamese"
+	rel="stylesheet">
+<link
+	href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700,800"
+	rel="stylesheet" type="text/css">
+<style>
+body {
+	padding: 1.5em;
+	background: #f5f5f5
+}
+
+table {
+	border: 1px #a39485 solid;
+	font-size: .9em;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, .25);
+	width: 100%;
+	border-collapse: collapse;
+	border-radius: 5px;
+	overflow: hidden;
+}
+
+th {
+	text-align: left;
+}
+
+thead {
+	font-weight: bold;
+	color: #fff;
+	background: #73685d;
+}
+
+td, th {
+	padding: 1em .5em;
+	vertical-align: middle;
+}
+
+td {
+	border-bottom: 1px solid rgba(0, 0, 0, .1);
+	background: #fff;
+}
+
+a {
+	color: #73685d;
+}
+
+@media all and (max-width: 768px) {
+	table, thead, tbody, th, td, tr {
+		display: block;
+	}
+	th {
+		text-align: right;
+	}
+	table {
+		position: relative;
+		padding-bottom: 0;
+		border: none;
+		box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+	}
+	thead {
+		float: left;
+		white-space: nowrap;
+	}
+	tbody {
+		overflow-x: auto;
+		overflow-y: hidden;
+		position: relative;
+		white-space: nowrap;
+	}
+	tr {
+		display: inline-block;
+		vertical-align: top;
+	}
+	th {
+		border-bottom: 1px solid #a39485;
+	}
+	td {
+		border-bottom: 1px solid #e5e5e5;
+	}
+}
+</style>
+<style>
+#aaaaaa {
+	background: #ffffff;
+	padding:30px 20px;
+	padding-top: 0;
+	text-align: left;
+	max-width: 450px;
+	margin: 20px auto;
+	position: relative;
+	box-sizing: border-box;
+	border-radius: 4px;
+}
+
+
+
+
+
+
+</style>
+
+
+
+<!--  <script>
+function trans(){
+	let suk_price1 = $('#bs.suk_price1').val();
+	let suk_num = $('#bs.suk_num1').val();
+	let res_num = $('#bs.res_num1').val();
+	
+	document.getElementById('suk_price1').value = suk_price1
+	document.getElementById('suk_num1').value = suk_num
+	document.getElementById('res_num1').value = res_num
+	document.getElementById("priceper").innerText = "결제금액: " + suk_price1;
+} 
+
+
+</script> -->
+
+</head>
+<body>
+
+	<!-- Preloader Start -->
+	<div class="preloader">
+		<div class="utf-preloader">
+			<span></span> <span></span> <span></span>
+		</div>
+	</div>
+	<!-- Preloader End -->
+	<!-- Wrapper -->
+	<div id="main_wrapper">
+		<header id="header_part" class="fullwidth">
+			<div id="header">
+				<div class="container">
+					<div class="utf_left_side">
+						<div id="logo">
+							<a th:href="@{/}">PickPick</a>
+						</div>
+						<div class="mmenu-trigger">
+							<button class="hamburger utfbutton_collapse" type="button">
+								<span class="utf_inner_button_box"> <span
+									class="utf_inner_section"></span>
+								</span>
+							</button>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+					<div class="utf_right_side">
+						<div class="header_widget"></div>
+					</div>
+
+				</div>
+			</div>
+
+
+
+		</header>
+
+		<div class="clearfix"></div>
+		<div class="container">
+
+			<div class="row utf_sticky_main_wrapper"
+				style="display: flex; justify-content: center;" th:each="msg:${msg}">
+				<div class="col-lg-8 col-md-8">
+					<div id="titlebar" class="utf_listing_titlebar">
+						<div class="utf_listing_titlebar_title" >
+							<h3>내가 받은 메세지</h3>
+							<p>
+								<span>제목 : </span><span th:text="${msg.msg_title}"></span>
+								
+							</p>
+							<p>
+							<span>전송 날짜 : </span><span th:text="${msg.msg_date}"></span> 
+							</p>
+							
+							<p>
+								<span>내용 : </span><span th:text="${msg.msg_contents}"></span>
+							</p>
+							<p>
+								<span>숙소번호 : </span><span th:text="${msg.suk_num}"></span>
+							</p>
+							<p>
+								<span>보낸 사람 아이디 : </span><span th:text="${msg.sender_mem_id}"></span>
+							</p>
+						
+							
+
+							<ul class="listing_item_social">
+								<!--   <li><a href="#">호스트와의 채팅</a></li> -->
+								<li><a th:href="@{/sukso/read(num=${msg.suk_num})}">상세정보</a></li>
+								<li><a th:href="@{/msg/letterMSG(sender_mem_id=${msg.sender_mem_id}, suk_num=${msg.suk_num})}">답장하기</a></li>
+							</ul>
+						</div>
+               
+
+		</div>
+	</div>
+	</div>
+	</div>
+	</div>
+	<!-- Scripts -->
+	<script src="../scripts/jquery-3.4.1.min.js"></script>
+	<script src="../scripts/chosen.min.js"></script>
+	<script src="../scripts/slick.min.js"></script>
+	<script src="../scripts/rangeslider.min.js"></script>
+	<script src="../scripts/magnific-popup.min.js"></script>
+	<script src="../scripts/jquery-ui.min.js"></script>
+	<script src="../scripts/mmenu.js"></script>
+	<script src="../scripts/tooltips.min.js"></script>
+	<script src="../scripts/color_switcher.js"></script>
+	<script src="../scripts/jquery_custom.js"></script>
+	<!-- Maps -->
+
+	<script src="../scripts/infobox.min.js"></script>
+	<script src="../scripts/markerclusterer.js"></script>
+	<script src="../scripts/maps.js"></script>
+	<script src="../scripts/quantityButtons.js"></script>
+	<script src="../scripts/moment.min.js"></script>
+	<script src="../scripts/daterangepicker.js"></script>
+	
+</body>
+
+</html>

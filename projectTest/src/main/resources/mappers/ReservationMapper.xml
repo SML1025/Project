@@ -1,0 +1,236 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.softsociety.exam.dao.ReservationDAO">
+
+	<!-- 회원정보 저장 -->
+	<insert id="insertRes" parameterType="reservation">
+	
+		insert into PP_Reservation (
+		res_num
+		, mem_id
+		, suk_num
+		, res_resdate
+        , res_outdate 
+        , res_pop 
+        , res_parking  
+        , res_pet 
+        , res_message 
+        , res_price
+		)
+		values (
+		PP_reservation_seq.nextval
+		, #{mem_id}
+		, #{suk_num}
+		, TO_DATE(#{res_resdate},'YYYY-MM-DD')       
+        , TO_DATE(#{res_outdate} ,'YYYY-MM-DD') 
+        , #{res_pop} 
+        , #{res_parking}  
+        , #{res_pet} 
+        , #{res_message} 
+        , #{res_price}
+	    
+		)
+	</insert>
+<update id="updateRes" parameterType="reservation">
+update PP_Reservation 
+           set
+		 res_resdate=TO_DATE(#{res_resdate},'YYYY-MM-DD')               
+        , res_outdate=TO_DATE(#{res_outdate} ,'YYYY-MM-DD') 
+        , res_pop= #{res_pop} 
+        , res_parking= #{res_parking} 
+        , res_pet= #{res_pet} 
+        , res_message= #{res_message} 
+        , res_price= #{res_price}
+		WHERE
+			suk_num = #{suk_num}
+</update>	
+	<delete id="deleteRes" parameterType="int">
+	delete pp_reservation where res_num=#{res_num}
+	
+	
+	</delete>
+	
+	
+	
+	
+<select id="checkbook" parameterType="String" resultType="bookSukso">
+select 
+r.res_num
+,r.mem_id
+,r.suk_num
+,r.res_resdate
+,r.res_outdate
+,r.res_pop
+,r.res_message
+,r.res_price
+,s.suk_name
+,s.suk_address
+,m.mem_nickname
+,s.suk_price1
+
+ from PP_reservation r, PP_sukso s, PP_member m where r.suk_num=s.suk_num and 
+ s.mem_id=m.mem_id and r.mem_id=#{mem_id} and r.res_state=0
+
+</select>
+	
+<!-- 
+<select id="checkbook" parameterType="String" resultType="bookSukso">
+select 
+r.res_num
+,r.mem_id
+,r.suk_num
+,r.res_resdate
+,r.res_outdate
+,r.res_pop
+,r.res_message
+,r.res_price
+,s.suk_name
+,s.suk_address
+,m.mem_nickname
+
+ from PP_reservation r, PP_sukso s, PP_member m where r.suk_num=s.suk_num and 
+ s.mem_id=m.mem_id and r.mem_id=#{mem_id} and r.res_state=0
+
+</select>
+ -->
+ 
+<select id="findRes" parameterType="String" resultType="Reservation">
+select * from pp_reservation where mem_id=#{mem_id} and res_state=3
+
+
+</select>
+
+<select id="checkdate" parameterType="Reservation" resultType="Reservation">
+
+SELECT
+	*
+FROM
+	PP_reservation
+
+WHERE
+	res_resdate &lt; = #{res_outdate}
+
+AND res_outdate &gt; = #{res_resdate}
+
+AND suk_num = #{suk_num}
+
+</select>
+
+
+<select id="getReservationByMemid" parameterType="String"
+	resultType="Reservation">
+	SELECT
+		*
+	FROM
+		pp_reservation
+	WHERE
+		mem_id = #{mem_id}
+	AND
+		res_state != 3
+</select>
+
+<select id="checkdate2" parameterType="Reservation" resultType="Reservation">
+SELECT
+  	*
+FROM
+  	PP_reservation
+WHERE
+	res_resdate &lt; = #{res_outdate}
+AND
+	res_outdate &gt; = #{res_resdate}
+AND
+	suk_num = #{suk_num}
+AND
+	mem_id != #{mem_id}
+</select>
+
+<select id="findRes2" parameterType="String" resultType="booksukso">
+select r.res_resdate, r.res_outdate, r.res_price, s.suk_name, m.mem_nickname from pp_reservation r, pp_sukso s, pp_member m 
+where r.suk_num=s.suk_num and
+r.mem_id=m.mem_id and s.mem_id=#{mem_id} and r.res_state=3 
+</select>
+
+<select id="checkbook2" parameterType="String" resultType="bookSukso">
+select 
+r.res_num
+,r.mem_id
+,r.suk_num
+,r.res_resdate
+,r.res_outdate
+,r.res_pop
+,r.res_message
+,r.res_price
+,s.suk_name
+,s.suk_address
+,m.mem_nickname
+,s.suk_price1
+
+ from PP_reservation r, PP_sukso s, PP_member m where r.suk_num=s.suk_num and s.mem_id=#{mem_id} and r.mem_id=m.mem_id and r.res_state=0
+
+</select>
+
+<select id="getNow" resultType="String">
+SELECT
+	TO_DATE(SYSDATE, 'YY-MM-DD')
+FROM
+	dual
+</select>
+
+<select id="getAllRes" resultType="Reservation">
+SELECT
+	*
+FROM
+	pp_reservation
+</select>
+
+<update id="updateTo1" parameterType="int">
+UPDATE 
+	PP_reservation
+SET
+	res_state = 1
+WHERE
+	res_num = ${res_num}
+</update>
+
+<update id="updateTo2" parameterType="int">
+UPDATE 
+	PP_reservation
+SET
+	res_state = 2
+WHERE
+	res_num = ${res_num}
+</update>
+
+<update id="updateTo3" parameterType="int">
+UPDATE 
+	PP_reservation
+SET
+	res_state = 3
+WHERE
+	res_num = ${res_num}
+</update>
+
+<insert id="ResMsg" parameterType="map">
+INSERT INTO 
+PP_MESSAGE (
+         msg_num
+      , msg_title
+      , sender_mem_id
+      , receiver_mem_id                    
+        , suk_num
+        , msg_contents 
+      )
+      values (
+      PP_MESSAGE_seq.nextval
+      , '예약날이 다가오고 있습니다.'
+      , 'Admin'
+      , #{mem_id}
+      , #{suk_num}
+      , '예약날이 다가오고 있습니다. 착오가 없도록 준비해 주세요.'
+      )
+
+</insert>
+
+</mapper>
